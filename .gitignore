@@ -1,4 +1,6 @@
-
+bin/__pycache__
+docs/plots
+docs/*.jpg
 data/
 
 
