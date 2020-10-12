@@ -31,19 +31,21 @@ def plotter(*args):
 
         plt.plot(list(arg[1].keys()), list(arg[1].values()), 'ob')
         plt.title(f"{arg[0]['kind']} {arg[0]['graph']} Linear"); plt.xlabel("x"); plt.ylabel("y")
-        plt.savefig(f'../docs/plots/{arg[0]["file"]}-lin')
+        plt.savefig(f'../docs/plots/{"-".join(arg[0]["graph"].split("-")[::-1])}/{arg[0]["file"]}-lin')
 
         plt.title(f"{arg[0]['kind']} {arg[0]['graph']} LogLog"); plt.xlabel(arg[0]['xlab']); plt.ylabel(arg[0]['ylab']) 
         plt.loglog(list(arg[1].keys()), list(arg[1].values()), 'or')
-        plt.savefig(f'../docs/plots/{arg[0]["file"]}-log')
+        plt.savefig(f'../docs/plots/{"-".join(arg[0]["graph"].split("-")[::-1])}/{arg[0]["file"]}-log')
+        plt.close()
 
 def hister(*args):
     for idx, arg in enumerate(args):
         plt.figure(figsize=(14,8))
-        x, y = zip(arg[1])
+        x = arg[1].keys(); y = arg[1].values()
         plt.bar(x, y)
         plt.title(f"{arg[0]['kind']} {arg[0]['graph']} Linear"); plt.xlabel("x"); plt.ylabel("y") 
-        plt.savefig(f"../docs/plots/{arg[0]['file']}-hist")
+        plt.savefig(f"../docs/plots/{'-'.join(arg[0]['graph'].split('-')[::-1])}/{arg[0]['file']}-hist")
+        plt.close()
 
 
 ############
@@ -83,6 +85,8 @@ def shortest_path(n = 10000):
 
 # call stack
 def main():
+    clustering()
+    degrees()
     shortest_path()
 
 
