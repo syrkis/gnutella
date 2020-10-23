@@ -27,3 +27,5 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+.idea/
+docs/.ipynb_checkpoints/

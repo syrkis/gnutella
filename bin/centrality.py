@@ -7,24 +7,43 @@ This scripts focuses on various centrality measures of the Gnutella network. For
 """
 
 # imports
-import sys
 import random
+import plotting
 import networkx as nx
-import numpy as np
-import pandas as pd
-from builder import S
-from collections import Counter
-from matplotlib import pyplot as plt
+from constructor import S
+
 
 
 # analysis
 def centrality(G):
-    betw = nx.betweenness_centrality(G, k = 1000)
-    ideg = nx.in_degree_centrality(G)
-    odeg = nx.out_degree_centrality(G)
-    clos = {nx.closeness_centrality(component(G), u = n) for n in sampler(component(G))} 
+    # betweenness
+    betw = nx.betweenness_centrality(G, k=1000)
+    in_meta = {"title": f"{G.name}, betweenness centrality",
+               "folder": "-".join(G.name.split("-")[::-1]),
+               "file": f"betw-cent-{G.name}",
+               "xlab": "C_b", "ylab": "P(C_b)"}
+    plotting.scatter(betw, in_meta)
+
+    #ideg = nx.in_degree_centrality(G)
+
+    #odeg = nx.out_degree_centrality(G)
+    # cloeseness
+    clos = {nx.closeness_centrality(component(G), u=n) for n in sampler(component(G))}
+    in_meta = {"title": f"{G.name}, closeness centrality",
+               "folder": "-".join(G.name.split("-")[::-1]),
+               "file": f"clos-cent-{G.name}",
+               "xlab": "C_b", "ylab": "P(C_b)"}
+    plotting.scatter(clos, in_meta)
+
+    # eigen
     eige = nx.eigenvector_centrality(G, max_iter=200)
-    print(eige)
+
+    clos = {nx.closeness_centrality(component(G), u=n) for n in sampler(component(G))}
+    in_meta = {"title": f"{G.name}, eigenvector centrality",
+               "folder": "-".join(G.name.split("-")[::-1]),
+               "file": f"eigen-cent-{G.name}",
+               "xlab": "C_b", "ylab": "P(C_b)"}
+    plotting.scatter(eige, in_meta)
 
 # helpers
 def component(G):
@@ -37,8 +56,7 @@ def sampler(G):
 
 # call stack
 def main():
-    for G in S.values():
-        centrality(G)
+    centrality(S[0])
 
 if __name__ == "__main__":
     main()
