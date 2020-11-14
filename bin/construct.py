@@ -1,4 +1,4 @@
-# constructor.py
+# construct.py
 #   preliminary exploration of the gnutelle network
 # by: Noah Syrkis
 
