@@ -9,7 +9,7 @@ import os
 
 
 # construct
-path = '../data/'
+path = '../data/graphs/'
 targets = [path + target for target in os.listdir(path)]
 S = {idx: nx.read_edgelist(target, delimiter="\t", create_using=nx.DiGraph(name='test')) \
      for idx, target in enumerate(targets)}
