@@ -46,7 +46,7 @@ class Centrality(object):
         for node in random.sample(L.nodes(), 1000):
             data[node] = nx.closeness_centrality(L, u=node)
         x, y = self.__centrality(data)
-        return list(x), list(y)
+        return list(x), list(y), data
 
     def __component(self, G):
         components = sorted(nx.strongly_connected_components(G), key=len)[::-1]

@@ -13,6 +13,7 @@ from collections import Counter
 from centrality import centrality
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+from attacker import Attack
 import os
 import json
 
@@ -33,6 +34,35 @@ class Metric:
         with open(f'../data/dumps/{self.name}.json', 'w') as json_file:
             json_file.write(json_data)
 
+    def attack(self):
+        A = Attack(self.G)
+        ps = [0.05 * i for i in range(0,20)]
+        rs, ds, es, pagerank = [], [], [], []
+        for p in ps:
+            r = A.random(p)
+            d = A.degrees(p)
+            e = A.eigen(p)
+            pa = A.pagerank(p)
+            rs.append(self.__connectivity(r))
+            ds.append(self.__connectivity(d))
+            es.append(self.__connectivity(e))
+            pagerank.append(self.__connectivity(pa))
+        plt.plot(ps, rs, 'b', label='random')
+        plt.plot(ps, ds, 'r', label='degree')
+        plt.plot(ps, es, 'g', label='eigenv')
+        plt.plot(ps, pagerank, 'y', label='pagerank')
+        plt.xlabel('fraction attacked'); plt.ylabel('frac. of nodes in largest comp.')
+        plt.legend(); plt.title(f"attack plot of {self.G.name}"); plt.show()
+
+    def __connectivity(self, G):
+        L = self.__component(G)
+        return len(L.nodes) / len(G.nodes)
+
+    def __component(self, G):
+        components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
+        L = G.subgraph(components[0])
+        return L
+
     def __setup(self, G):
         # degree distribution
         G_degs = self.__degfreq(G)
@@ -50,6 +80,7 @@ class Metric:
         self.data['C'] = {'centrality': centrality(C),
                           'clustering': self.__clustering(C),
                           'knn': [list(knn.keys()), list(knn.values())]}
+
 
     def __degfreq(self, G):
         in_freq = Counter(dict(G.in_degree).values())
@@ -69,6 +100,7 @@ class Metric:
         x = 0.5 * (x[1:] + x[:-1])
         y = [1 - v for v in n]
         return [list(x), list(y)]
+
 
     def __clustering(self, G):
         if G.is_multigraph():
@@ -91,7 +123,8 @@ def main():
         if not construct and f"{G.name}.json" in os.listdir('../data/dumps/'):
             with open(f"../data/dumps/{G.name}.json", 'r') as data_file:
                 data = json.load(data_file)
-            D = Metric(S[0], data=data)
+            D = Metric(G, data=data)
+            D.attack()
         else:               # read graph analysis data from file
             D = Metric(G)
             D.build()
