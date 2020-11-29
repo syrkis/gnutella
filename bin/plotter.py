@@ -42,7 +42,7 @@ class Plotter(object):
         fit.exponential.plot_ccdf(ax=fig, color='b', linestyle='--', label='exponential fit')
         fit.truncated_power_law.plot_ccdf(ax=fig, color='k', linestyle='--', label='truncated power law fit')
         plt.legend(); plt.title(f"{self.name} fit"); plt.ylabel(r"$P(k>=x)$"); plt.xlabel(r'$x$')
-        plt.show()
+        plt.savefig(f'../plots/{self.name}/fitting-{self.name}.png', dpi=300); plt.close()
 
     def __cendist(self, G_cen, C_cen):
         fig, axes = plt.subplots(5, 1, figsize=(8, 14))
@@ -50,7 +50,7 @@ class Plotter(object):
         for idx, key in enumerate(G_cen.keys()):
             axes[idx].loglog(G_cen[key][0], G_cen[key][1], 'ro')
             axes[idx].loglog(C_cen[key][0], C_cen[key][1], 'bo')
-        plt.show()
+        plt.savefig(f'../plots/{self.name}/centrality-{self.name}.png', dpi=300); plt.close()
 
     def __attack(self, data):
         kinds = ['random', 'degree', 'eigen', 'pagerank']; colors = 'brgy'
@@ -61,7 +61,7 @@ class Plotter(object):
             # exec(f"plt.plot(C[-1], C[i], colors[i], linestyle='--', label='conf. {kinds[i]}')")
         plt.xlabel('fraction attacked'); plt.ylabel('frac. of nodes in largest comp.')
         plt.legend(); plt.title(f"attack plot of {self.name}")
-        plt.show()
+        plt.savefig(f'../plots/{self.name}/attack-{self.name}.png', dpi=300); plt.close()
 
     def __degdist(self, data):
         kinds = ['loglog', 'loglog']; color = ['ro', 'bo']
@@ -72,7 +72,7 @@ class Plotter(object):
             for jdx in range(len(axes[idx])):
                 x, y = focus[jdx]
                 exec(f"axes[idx][jdx].{kinds[idx]}(x[:-1], y[:-1], '{color[jdx]}')")
-        plt.show()
+        plt.savefig(f'../plots/{self.name}/degree-dist-{self.name}.png', dpi=300); plt.close()
 
 
 def main():
