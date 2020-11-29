@@ -23,6 +23,7 @@ class Metric:
 
     def __init__(self, G, data={}):
         self.G = G
+        self.U = nx.Graph(G)
         self.name = G.name
         self.data = data
 
@@ -34,35 +35,6 @@ class Metric:
         with open(f'../data/dumps/{self.name}.json', 'w') as json_file:
             json_file.write(json_data)
 
-    def attack(self):
-        A = Attack(self.G)
-        ps = [0.05 * i for i in range(0,20)]
-        rs, ds, es, pagerank = [], [], [], []
-        for p in ps:
-            r = A.random(p)
-            d = A.degrees(p)
-            e = A.eigen(p)
-            pa = A.pagerank(p)
-            rs.append(self.__connectivity(r))
-            ds.append(self.__connectivity(d))
-            es.append(self.__connectivity(e))
-            pagerank.append(self.__connectivity(pa))
-        plt.plot(ps, rs, 'b', label='random')
-        plt.plot(ps, ds, 'r', label='degree')
-        plt.plot(ps, es, 'g', label='eigenv')
-        plt.plot(ps, pagerank, 'y', label='pagerank')
-        plt.xlabel('fraction attacked'); plt.ylabel('frac. of nodes in largest comp.')
-        plt.legend(); plt.title(f"attack plot of {self.G.name}"); plt.show()
-
-    def __connectivity(self, G):
-        L = self.__component(G)
-        return len(L.nodes) / len(G.nodes)
-
-    def __component(self, G):
-        components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
-        L = G.subgraph(components[0])
-        return L
-
     def __setup(self, G):
         # degree distribution
         G_degs = self.__degfreq(G)
@@ -73,14 +45,29 @@ class Metric:
         self.data['clustering'] = self.__clustering(G)
         knn = nx.k_nearest_neighbors(G)
         self.data['knn'] = [list(knn.keys()), list(knn.values())]
-
+        # attacks
+        self.data['attack'] = self.__attack(G)
         # configuration metrics
         C = self.__config(G)
         knn = nx.k_nearest_neighbors(C)
-        self.data['C'] = {'centrality': centrality(C),
+        self.data['C'] = {'attack': self.__attack(C), 'centrality': centrality(C),
                           'clustering': self.__clustering(C),
                           'knn': [list(knn.keys()), list(knn.values())]}
 
+    def __attack(self, G):
+        A = Attack(G)
+        ps = [0.05 * i for i in range(0, 20)]
+        rs, ds, es, pr = [], [], [], []
+        for p in ps:
+            r = A.random(p)
+            d = A.degrees(p)
+            e = A.eigen(p)
+            pa = A.pagerank(p)
+            rs.append(self.__connectivity(r))
+            ds.append(self.__connectivity(d))
+            es.append(self.__connectivity(e))
+            pr.append(self.__connectivity(pa))
+        return rs, ds, es, pr
 
     def __degfreq(self, G):
         in_freq = Counter(dict(G.in_degree).values())
@@ -101,7 +88,6 @@ class Metric:
         y = [1 - v for v in n]
         return [list(x), list(y)]
 
-
     def __clustering(self, G):
         if G.is_multigraph():
             G = nx.DiGraph(G)
@@ -115,6 +101,14 @@ class Metric:
         d_out = [G.out_degree[node] for node in G.nodes]
         return nx.directed_configuration_model(d_in, d_out)
 
+    def __connectivity(self, G):
+        L = self.__component(G)
+        return len(L.nodes) / len(G.nodes)
+
+    def __component(self, G):
+        components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
+        L = G.subgraph(components[0])
+        return L
 
 # script
 def main():
