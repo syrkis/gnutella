@@ -41,6 +41,8 @@ class Attack(object):
 
     def pagerank(self, p):
         G = self.L
+        if G.is_multigraph():
+            G = nx.DiGraph(G)
         eiges = nx.pagerank(G)
         nodes = [(k, v) for k, v in eiges.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
