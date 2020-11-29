@@ -28,10 +28,7 @@ class Plotter(object):
         G_cen = data['centrality']
         C_cen = data['C']['centrality']
         self.__cendist(G_cen, C_cen)
-        #rs, ds, es, pr, ps = self.data['attack']
-        #self.__attack(rs, ds, es, pr, ps)
-        #rs, ds, es, pr, ps = self.data['C']['attack']
-        #self.__attack(rs, ds, es, pr, ps)
+        self.__attack(data)
         self.__fitting(data)
 
 
@@ -39,13 +36,12 @@ class Plotter(object):
         _, y = data['degs']['in']
         y = np.array(y); mask = y >= 3
         fit = powerlaw.Fit(y[mask], verbose=False)
-        fig = fit.plot_ccdf(label='CCDF', linestyle='--', marker='o')
-        fit.lognormal.plot_ccdf(ax=fig, color='r', linestyle='--', label='log-normal fit')
+        fig = fit.plot_ccdf(label='CCDF', color='r', linestyle='--', marker='o')
+        fit.lognormal.plot_ccdf(ax=fig, color='c', linestyle='--', label='log-normal fit')
         fit.power_law.plot_ccdf(ax=fig, color='g', linestyle='--', label='power-law fit')
         fit.exponential.plot_ccdf(ax=fig, color='b', linestyle='--', label='exponential fit')
         fit.truncated_power_law.plot_ccdf(ax=fig, color='k', linestyle='--', label='truncated power law fit')
-        fit.stretched_exponential.plot_ccdf(ax=fig, color='c', linestyle='--', label='stretched exponential fit')
-        plt.legend(); plt.title(f"{self.name} fit"); plt.ylabel(r"$P(k>x)$"); plt.xlabel('k')
+        plt.legend(); plt.title(f"{self.name} fit"); plt.ylabel(r"$P(k>=x)$"); plt.xlabel(r'$x$')
         plt.show()
 
     def __cendist(self, G_cen, C_cen):
@@ -56,13 +52,13 @@ class Plotter(object):
             axes[idx].loglog(C_cen[key][0], C_cen[key][1], 'bo')
         plt.show()
 
-    def __attack(self, rs, ds, es, pr, ps):
+    def __attack(self, data):
         kinds = ['random', 'degree', 'eigen', 'pagerank']; colors = 'brgy'
-        G = self.data['attack']
-        C = self.data['C']['attack']
+        G = data['attack']
+        C = data['C']['attack']
         for i in range(len(G) - 1):
-            exec(f"plt.plot(G[-1], G[i], colors[i], label='orig. kinds[i]')")
-            exec(f"plt.plot(C[-1], C[i], colors[i], linestyle='--', label='conf. kinds[i]')")
+            exec(f"plt.plot(G[-1], G[i], colors[i], label='orig. {kinds[i]}')")
+            # exec(f"plt.plot(C[-1], C[i], colors[i], linestyle='--', label='conf. {kinds[i]}')")
         plt.xlabel('fraction attacked'); plt.ylabel('frac. of nodes in largest comp.')
         plt.legend(); plt.title(f"attack plot of {self.name}")
         plt.show()
