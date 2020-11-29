@@ -31,7 +31,7 @@ class Attack(object):
     def eigen(self, p):
         G = self.L
         if G.is_multigraph():
-            G = nx.DiGraph(G)
+            G = nx.Di Graph(G)
         eiges = nx.eigenvector_centrality(G, max_iter=200)
         nodes = [(k, v) for k, v in eiges.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
