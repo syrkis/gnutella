@@ -20,7 +20,7 @@ class Plotter(object):
         self.data = data
         self.name = name
         self.graph = graph
-        self.theme = 'seaborn'
+        self.theme = 'seaborn-darkgrid'
 
     def plot(self):
         data = self.data
