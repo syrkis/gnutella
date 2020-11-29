@@ -25,6 +25,8 @@ class Plotter(object):
         G_cen = data['centrality']
         C_cen = data['C']['centrality']
         self.__cendist(G_cen, C_cen)
+        rs, ds, es, pr, ps = self.data['attack']
+        self.__attack(rs, ds, es, pr, ps)
 
     def __cendist(self, G_cen, C_cen):
         fig, axes = plt.subplots(5, 1, figsize=(8, 14))
@@ -33,6 +35,16 @@ class Plotter(object):
             axes[idx].loglog(G_cen[key][0], G_cen[key][1], 'ro')
             axes[idx].loglog(C_cen[key][0], C_cen[key][1], 'bo')
         plt.show()
+
+    def __attack(self, rs, ds, es, pr, ps):
+        plt.plot(ps, rs, 'b', label='random')
+        plt.plot(ps, ds, 'r', label='degree')
+        plt.plot(ps, es, 'g', label='eigenv')
+        plt.plot(ps, pr, 'y', label='pagerank')
+        plt.xlabel('fraction attacked'); plt.ylabel('frac. of nodes in largest comp.')
+        plt.legend(); plt.title(f"attack plot of {self.name}")
+        plt.show()
+
 
     def __degdist(self, data):
         kinds = ['loglog', 'loglog']; color = ['ro', 'bo']

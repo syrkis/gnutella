@@ -67,7 +67,7 @@ class Metric:
             ds.append(self.__connectivity(d))
             es.append(self.__connectivity(e))
             pr.append(self.__connectivity(pa))
-        return rs, ds, es, pr
+        return rs, ds, es, pr, ps
 
     def __degfreq(self, G):
         in_freq = Counter(dict(G.in_degree).values())
@@ -112,13 +112,12 @@ class Metric:
 
 # script
 def main():
-    construct = False        # if True we reconstruct the graph analysis data.
+    construct = True        # if True we reconstruct the graph analysis data.
     for G in tqdm(S.values()):
         if not construct and f"{G.name}.json" in os.listdir('../data/dumps/'):
             with open(f"../data/dumps/{G.name}.json", 'r') as data_file:
                 data = json.load(data_file)
             D = Metric(G, data=data)
-            D.attack()
         else:               # read graph analysis data from file
             D = Metric(G)
             D.build()
