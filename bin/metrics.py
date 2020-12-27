@@ -57,17 +57,19 @@ class Metric:
     def __robustness(self, G):
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
-        rs, ds, es, pr = [], [], [], []
-        for p in ps:
+        rs, ds, es, pr, eigs = [], [], [], [], []
+        for p in tqdm(ps):
             r = A.random(p)
             d = A.degrees(p)
             e = A.closeness(p)
             pa = A.betweenness(p)
+            eig = A.eigen(p)
             rs.append(self.__connectivity(r))
             ds.append(self.__connectivity(d))
             es.append(self.__connectivity(e))
             pr.append(self.__connectivity(pa))
-        return rs, ds, es, pr, ps        # random, degreee, closeness, betweenness, portions
+            eigs.append(self.__connectivity(eig))
+        return rs, ds, es, pr, eigs, ps        # random, degree, closeness, betweenness, eigen, portions
 
     def __degfreq(self, G):
         U = nx.to_undirected(G)

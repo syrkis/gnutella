@@ -102,7 +102,7 @@ class Robustness(object):
                                                 unweighted=False)
 
         n = D.shape[0]
-        for r in tqdm(range(n)):
+        for r in range(n):
             cc = 0.0
             possible_paths = list(enumerate(D[r, :]))
             shortest_paths = dict(filter(\
