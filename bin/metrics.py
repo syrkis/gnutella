@@ -50,6 +50,8 @@ class Metric:
         # configuration metrics
         C = self.__config(G)
         knn = nx.k_nearest_neighbors(C)
+        if C.is_multigraph():
+            C = nx.DiGraph(G)
         self.data['C'] = {'robustness': self.__robustness(C), 'centrality': centrality(C),
                           'clustering': self.__clustering(C),
                           'knn': [list(knn.keys()), list(knn.values())]}
@@ -57,19 +59,17 @@ class Metric:
     def __robustness(self, G):
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
-        rs, ds, es, pr, eigs = [], [], [], [], []
+        rs, ds, es, pr = [], [], [], []
         for p in ps:
             r = A.random(p)
             d = A.degrees(p)
             e = A.closeness(p)
-            pa = A.betweenness(p)
-            eig = A.eigen(p)
+            #pa = A.betweenness(p)
             rs.append(self.__connectivity(r))
             ds.append(self.__connectivity(d))
             es.append(self.__connectivity(e))
-            pr.append(self.__connectivity(pa))
-            eigs.append(self.__connectivity(eig))
-        return rs, ds, es, pr, eigs, ps        # random, degree, closeness, betweenness, eigen, portions
+            #pr.append(self.__connectivity(pa))
+        return rs, ds, es, pr, ps        # random, degree, closeness, betweenness, eigen, portions
 
     def __degfreq(self, G):
         U = nx.to_undirected(G)

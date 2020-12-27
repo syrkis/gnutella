@@ -27,8 +27,8 @@ class Robustness(object):
     def __init__(self, graph):
         self.graph = graph
         self.L = self.__component(self.graph)
-        self.B = self.__betweenness()
         self.C = self.__closenss()
+        #self.B = self.__betweenness()
 
     def random(self, p):
         G = self.L
@@ -45,8 +45,6 @@ class Robustness(object):
 
     def eigen(self, p):
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
         eiges = nx.eigenvector_centrality(G, max_iter=200)
         nodes = [(k, v) for k, v in eiges.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
@@ -56,8 +54,6 @@ class Robustness(object):
 
     def closeness(self, p):
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
         nodes = self.C[int(len(self.C) * p):]
         nodes = [str(node) for node in nodes]
         S = nx.subgraph(G, nodes)
@@ -69,14 +65,11 @@ class Robustness(object):
         nodes = [(k, v) for k, v in out.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
-        nodes = [int(node) for node in nodes]
         S = nx.subgraph(G, nodes)
         return S
 
     def pagerank(self, p):
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
         eiges = nx.pagerank(G)
         nodes = [(k, v) for k, v in eiges.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
@@ -95,12 +88,7 @@ class Robustness(object):
 
     def __betweenness(self):
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
-        ccs = {}
-        for node in tqdm(G.nodes):
-            ccs[node] = nx.algorithms.centrality.betweenness_centrality_subset(G, sources=[node], targets=G.nodes)
-        return ccs
+        return nx.betweenness_centrality(G)
 
     def __closenss(self):
         """
