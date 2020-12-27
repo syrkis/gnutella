@@ -28,6 +28,7 @@ class Robustness(object):
         self.graph = graph
         self.L = self.__component(self.graph)
         self.C = self.__closenss()
+        self.B = self.__betweenness()
 
     def random(self, p):
         G = self.L
@@ -62,7 +63,7 @@ class Robustness(object):
 
     def betweenness(self, p):
         G = self.L
-        out = nx.betweenness_centrality(G)
+        out = self.B
         nodes = [(k, v) for k, v in out.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
@@ -88,6 +89,9 @@ class Robustness(object):
         components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
         L = G.subgraph(components[0])
         return L
+
+    def __betweenness(self):
+        return nx.betweenness_centrality(self.L)
 
     def __closenss(self):
         """
