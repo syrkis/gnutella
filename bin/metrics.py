@@ -13,7 +13,7 @@ from collections import Counter
 from centrality import centrality
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-from attacker import Attack
+from robustness import Robustness
 import os
 import json
 
@@ -39,48 +39,50 @@ class Metric:
         # degree distribution
         G_degs = self.__degfreq(G)
         self.data['degs'] = {'in': G_degs[0], 'out': G_degs[1],
-                             'ccdf_in': G_degs[2], 'ccdf_out': G_degs[3]}
+                             'all': G_degs[2]}
         # centrality measures, clustering, knn
+        self.data['robustness'] = self.__robustness(G)
         self.data['centrality'] = centrality(G)
         self.data['clustering'] = self.__clustering(G)
         knn = nx.k_nearest_neighbors(G)
         self.data['knn'] = [list(knn.keys()), list(knn.values())]
         # attacks
-        self.data['attack'] = self.__attack(G)
         # configuration metrics
         C = self.__config(G)
         knn = nx.k_nearest_neighbors(C)
-        self.data['C'] = {'attack': self.__attack(C), 'centrality': centrality(C),
+        self.data['C'] = {'robustness': self.__robustness(C), 'centrality': centrality(C),
                           'clustering': self.__clustering(C),
                           'knn': [list(knn.keys()), list(knn.values())]}
 
-    def __attack(self, G):
-        A = Attack(G)
+    def __robustness(self, G):
+        A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
         rs, ds, es, pr = [], [], [], []
         for p in ps:
             r = A.random(p)
             d = A.degrees(p)
-            e = A.eigen(p)
-            pa = A.pagerank(p)
+            e = A.closeness(p)
+            pa = A.betweenness(p)
             rs.append(self.__connectivity(r))
             ds.append(self.__connectivity(d))
             es.append(self.__connectivity(e))
             pr.append(self.__connectivity(pa))
-        return rs, ds, es, pr, ps
+        return rs, ds, es, pr, ps        # random, degreee, closeness, betweenness, portions
 
     def __degfreq(self, G):
+        U = nx.to_undirected(G)
+        all = list(dict(U.degree).values())
         in_freq = Counter(dict(G.in_degree).values())
         in_x = list(in_freq.keys())
         in_y = list(in_freq.values())
         out_freq = Counter(dict(G.out_degree).values())
         out_x = list(out_freq.keys())
         out_y = list(out_freq.values())
-        ins = list(dict(G.in_degree).values())      # ccdf setup
-        outs = list(dict(G.out_degree).values())    # ccdf setup
-        in_ccdf_x, in_ccdf_y = self.__ccdf(ins)
-        out_ccdf_x, out_ccdf_y = self.__ccdf(outs)
-        return [in_x, in_y], [out_x, out_y], [in_ccdf_x, in_ccdf_y], [out_ccdf_x, out_ccdf_y]
+        # ins = list(dict(G.in_degree).values())      # ccdf setup
+        # outs = list(dict(G.out_degree).values())    # ccdf setup
+        # in_ccdf_x, in_ccdf_y = self.__ccdf(ins)
+        # out_ccdf_x, out_ccdf_y = self.__ccdf(outs)
+        return [in_x, in_y], [out_x, out_y], all
 
     def __ccdf(self, degs):
         n, x, _ = plt.hist(degs, density=True, cumulative=True, bins=100); plt.close()
