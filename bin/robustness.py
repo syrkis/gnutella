@@ -65,12 +65,11 @@ class Robustness(object):
 
     def betweenness(self, p):
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
         out = self.B
         nodes = [(k, v) for k, v in out.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
+        nodes = [int(node) for node in nodes]
         S = nx.subgraph(G, nodes)
         return S
 
