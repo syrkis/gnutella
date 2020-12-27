@@ -95,7 +95,10 @@ class Robustness(object):
         return L
 
     def __betweenness(self):
-        return nx.betweenness_centrality(self.L)
+        G = self.L
+        if G.is_multigraph():
+            G = nx.DiGraph(G)
+        return nx.betweenness_centrality(G)
 
     def __closenss(self):
         """
@@ -104,6 +107,8 @@ class Robustness(object):
         """
         ccs = {}
         G = self.L
+        if G.is_multigraph():
+            G = nx.DiGraph(G)
         A = nx.adjacency_matrix(G).tolil()
         D = scipy.sparse.csgraph.floyd_warshall(A,
                                                 directed=False,
