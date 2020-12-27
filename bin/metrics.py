@@ -58,7 +58,7 @@ class Metric:
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
         rs, ds, es, pr, eigs = [], [], [], [], []
-        for p in tqdm(ps):
+        for p in ps:
             r = A.random(p)
             d = A.degrees(p)
             e = A.closeness(p)

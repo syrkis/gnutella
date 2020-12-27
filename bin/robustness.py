@@ -27,8 +27,8 @@ class Robustness(object):
     def __init__(self, graph):
         self.graph = graph
         self.L = self.__component(self.graph)
-        self.C = self.__closenss()
         self.B = self.__betweenness()
+        self.C = self.__closenss()
 
     def random(self, p):
         G = self.L
@@ -98,7 +98,10 @@ class Robustness(object):
         G = self.L
         if G.is_multigraph():
             G = nx.DiGraph(G)
-        return nx.betweenness_centrality(G)
+        ccs = {}
+        for node in tqdm(G.nodes):
+            ccs[node] = nx.algorithms.centrality.betweenness_centrality_subset(G, sources=[node], targets=G.nodes)
+        return ccs
 
     def __closenss(self):
         """
