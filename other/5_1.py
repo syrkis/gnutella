@@ -23,7 +23,6 @@ for node in tqdm(range(5, n + 1)):
     if node in (10 ** 2, 10 ** 3, 10 ** 4):
         D.append([len(v) for v in N.values()])
 
-
 # 5.1.1
 
 for i in range(len(D)):
@@ -48,4 +47,5 @@ plt.xlabel(r'$x$'); plt.ylabel(r'$P(k >= x)$'); plt.legend()
 plt.show()
 
 # 5.1.3
+
 print(alphas) # alphas are all around 3, as expected

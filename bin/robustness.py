@@ -3,14 +3,13 @@
 # by: Noah Syrkis
 
 # imports
-from construct import S
 import random
 import networkx as nx
 from operator import itemgetter
 import numpy as np
 import scipy.sparse
 import scipy.sparse.csgraph
-from tqdm import tqdm
+import gc; gc.enable()
 
 
 class Robustness(object):
@@ -26,9 +25,9 @@ class Robustness(object):
     """
     def __init__(self, graph):
         self.graph = graph
-        self.L = self.__component(self.graph)
+        self.L = self.__component(graph)
+        self.B = self.__betweenness()
         self.C = self.__closenss()
-        #self.B = self.__betweenness()
 
     def random(self, p):
         G = self.L
@@ -43,19 +42,9 @@ class Robustness(object):
         S = nx.subgraph(G, nodes)
         return S
 
-    def eigen(self, p):
-        G = self.L
-        eiges = nx.eigenvector_centrality(G, max_iter=200)
-        nodes = [(k, v) for k, v in eiges.items()]
-        nodes = sorted(nodes, key=itemgetter(1))[::-1]
-        nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
-        S = nx.subgraph(G, nodes)
-        return S
-
     def closeness(self, p):
         G = self.L
         nodes = self.C[int(len(self.C) * p):]
-        nodes = [str(node) for node in nodes]
         S = nx.subgraph(G, nodes)
         return S
 
@@ -63,15 +52,6 @@ class Robustness(object):
         G = self.L
         out = self.B
         nodes = [(k, v) for k, v in out.items()]
-        nodes = sorted(nodes, key=itemgetter(1))[::-1]
-        nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
-        S = nx.subgraph(G, nodes)
-        return S
-
-    def pagerank(self, p):
-        G = self.L
-        eiges = nx.pagerank(G)
-        nodes = [(k, v) for k, v in eiges.items()]
         nodes = sorted(nodes, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
         S = nx.subgraph(G, nodes)
@@ -97,13 +77,10 @@ class Robustness(object):
         """
         ccs = {}
         G = self.L
-        if G.is_multigraph():
-            G = nx.DiGraph(G)
         A = nx.adjacency_matrix(G).tolil()
         D = scipy.sparse.csgraph.floyd_warshall(A,
-                                                directed=False,
-                                                unweighted=False)
-
+                                                directed=True,
+                                                unweighted=True)
         n = D.shape[0]
         for r in range(n):
             cc = 0.0
@@ -124,10 +101,12 @@ class Robustness(object):
 
 
 def main():
+    from construct import S
     G = list(S.values())[-2]
     robustness = Robustness(G)
     #attack.random(0.1)
-    robustness.betweenness(0.1)
+    S = robustness.closeness(0.1)
+    print(nx.info(S))
 
 
 if __name__ == "__main__":

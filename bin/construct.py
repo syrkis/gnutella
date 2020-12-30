@@ -11,7 +11,7 @@ import os
 # construct
 path = '../data/graphs/'
 targets = [path + target for target in os.listdir(path) if target[-1] == 't']
-S = {idx: nx.read_edgelist(target, delimiter="\t", create_using=nx.DiGraph(name='test')) \
+S = {idx: nx.read_edgelist(target, delimiter="\t", create_using=nx.DiGraph(name='test'), nodetype=int) \
      for idx, target in enumerate(targets)}
 for idx, G in enumerate(S):
     S[G].name = targets[idx][-6:-4] + '-08-2002'

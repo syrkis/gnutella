@@ -16,6 +16,7 @@ from tqdm import tqdm
 from robustness import Robustness
 import os
 import json
+import gc; gc.enable()
 
 
 # class
@@ -40,7 +41,7 @@ class Metric:
         G_degs = self.__degfreq(G)
         self.data['degs'] = {'in': G_degs[0], 'out': G_degs[1],
                              'all': G_degs[2]}
-        # centrality measures, clustering, knn
+        # entrality measures, clustering, knn
         self.data['robustness'] = self.__robustness(G)
         self.data['centrality'] = centrality(G)
         self.data['clustering'] = self.__clustering(G)
@@ -50,8 +51,6 @@ class Metric:
         # configuration metrics
         C = self.__config(G)
         knn = nx.k_nearest_neighbors(C)
-        if C.is_multigraph():
-            C = nx.DiGraph(G)
         self.data['C'] = {'robustness': self.__robustness(C), 'centrality': centrality(C),
                           'clustering': self.__clustering(C),
                           'knn': [list(knn.keys()), list(knn.values())]}
@@ -59,17 +58,17 @@ class Metric:
     def __robustness(self, G):
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
-        rs, ds, es, pr = [], [], [], []
-        for p in ps:
+        rands, degs, closs, betws = [], [], [], []
+        for p in tqdm(ps):
             r = A.random(p)
             d = A.degrees(p)
-            e = A.closeness(p)
-            #pa = A.betweenness(p)
-            rs.append(self.__connectivity(r))
-            ds.append(self.__connectivity(d))
-            es.append(self.__connectivity(e))
-            #pr.append(self.__connectivity(pa))
-        return rs, ds, es, pr, ps        # random, degree, closeness, betweenness, eigen, portions
+            c = A.closeness(p)
+            b = A.betweenness(p)
+            rands.append(self.__connectivity(r))
+            degs.append(self.__connectivity(d))
+            closs.append(self.__connectivity(c))
+            betws.append(self.__connectivity(b))
+        return rands, degs, closs, betws, ps        # random, degree, closeness, betweenness, eigen, portions
 
     def __degfreq(self, G):
         U = nx.to_undirected(G)
@@ -103,7 +102,9 @@ class Metric:
     def __config(self, G):
         d_in = [G.in_degree[node] for node in G.nodes]
         d_out = [G.out_degree[node] for node in G.nodes]
-        return nx.directed_configuration_model(d_in, d_out)
+        C = nx.directed_configuration_model(d_in, d_out)
+        C = nx.DiGraph(C)
+        return C
 
     def __connectivity(self, G):
         L = self.__component(G)
