@@ -6,22 +6,12 @@
 import random
 import networkx as nx
 from operator import itemgetter
-import numpy as np
-import scipy.sparse
-import scipy.sparse.csgraph
-import gc; gc.enable()
 
 
 class Robustness(object):
     """
-    This class takes in a given when initialized.
-
-    It has several attack methods, each outputting a subgraph consisting
-    of what remains when removing p percent of the network
-    with a given heuristic (i.e. random, by closeness, by degree, etc.)
-
-    In addition to this there are several helper functions beginning with
-    __.
+    Class is initiated with graph. It precalculates betweenness centrality and finds largest component.
+    Below are various methods of testing network robustness.
     """
     def __init__(self, graph):
         self.graph = graph
@@ -29,25 +19,28 @@ class Robustness(object):
         self.B = self.__betweenness()
 
     def random(self, p):
+        """
+        removes a p-th of the nodes randomly and returns subgraph
+        """
         G = self.L
         nodes = random.sample(G.nodes, int(float(len(G.nodes)) * (1-p)))
         S = nx.subgraph(G, nodes)
         return S
 
     def degrees(self, p):
+        """
+        Removes a p-th of the nodes by degree and returns subgraph
+        """
         G = self.L
         degs = sorted(G.degree, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in degs][int(len(degs) * p):]
         S = nx.subgraph(G, nodes)
         return S
 
-    def closeness(self, p):
-        G = self.L
-        nodes = self.C[int(len(self.C) * p):]
-        S = nx.subgraph(G, nodes)
-        return S
-
     def betweenness(self, p):
+        """
+        Removes a p-th of the nodes by betweenness centrality and returns subgraph
+        """
         G = self.L
         out = self.B
         nodes = [(k, v) for k, v in out.items()]
@@ -59,17 +52,17 @@ class Robustness(object):
     def __component(self, G):
         """
         Takes in graph and returns largest strongly connected component
-        therein
         """
         components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
         L = G.subgraph(components[0])
         return L
 
     def __betweenness(self):
+        """
+        for pre-computing betweenness centrality scores so as to not recompute for every p
+        """
         G = self.L
         return nx.betweenness_centrality(G)
-
-
 
 
 def main():
