@@ -30,6 +30,7 @@ class Centrality(object):
             G = nx.DiGraph(G)
         self.data['betweenness'] = self.__centrality(nx.betweenness_centrality(G, k=1000))
         self.data['eigenvector'] = self.__centrality(nx.eigenvector_centrality(G, max_iter=200))
+        self.data['degree'] = self.__centrality(nx.degree_centrality(G))
         self.data['in_degree'] = self.__centrality(nx.in_degree_centrality(G))
         self.data['out_degree'] = self.__centrality(nx.out_degree_centrality(G))
         self.data['closeness'] = self.__closeness(G)

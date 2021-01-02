@@ -27,7 +27,6 @@ class Robustness(object):
         self.graph = graph
         self.L = self.__component(graph)
         self.B = self.__betweenness()
-        self.C = self.__closenss()
 
     def random(self, p):
         G = self.L
@@ -70,33 +69,6 @@ class Robustness(object):
         G = self.L
         return nx.betweenness_centrality(G)
 
-    def __closenss(self):
-        """
-        Linear algebra trick to calculate closeness for the entire
-        network in less than a year.
-        """
-        ccs = {}
-        G = self.L
-        A = nx.adjacency_matrix(G).tolil()
-        D = scipy.sparse.csgraph.floyd_warshall(A,
-                                                directed=True,
-                                                unweighted=True)
-        n = D.shape[0]
-        for r in range(n):
-            cc = 0.0
-            possible_paths = list(enumerate(D[r, :]))
-            shortest_paths = dict(filter(\
-                lambda x: not x[1] == np.inf, possible_paths))
-            total = sum(shortest_paths.values())
-            n_shortest_paths = len(shortest_paths) - 1.0
-
-            if total > 0.0 and n > 1:
-                s = n_shortest_paths / (n - 1)
-                cc = (n_shortest_paths / total) * s
-            ccs[r] = cc
-
-        nodes_sorted_by_closeness = sorted(ccs, key=ccs.__getitem__, reverse=True)
-        return nodes_sorted_by_closeness
 
 
 

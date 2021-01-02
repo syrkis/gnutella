@@ -39,51 +39,39 @@ class Metric:
     def __setup(self, G):
         # degree distribution
         G_degs = self.__degfreq(G)
-        self.data['degs'] = {'in': G_degs[0], 'out': G_degs[1],
-                             'all': G_degs[2]}
+        self.data['degs'] = {'in': G_degs[0], 'out': G_degs[1]}
         # entrality measures, clustering, knn
         self.data['robustness'] = self.__robustness(G)
         self.data['centrality'] = centrality(G)
         self.data['clustering'] = self.__clustering(G)
-        knn = nx.k_nearest_neighbors(G)
-        self.data['knn'] = [list(knn.keys()), list(knn.values())]
-        # attacks
+        self.data['shortest'] = nx.average_shortest_path_length(G)
+
         # configuration metrics
         C = self.__config(G)
-        knn = nx.k_nearest_neighbors(C)
         self.data['C'] = {'robustness': self.__robustness(C), 'centrality': centrality(C),
-                          'clustering': self.__clustering(C),
-                          'knn': [list(knn.keys()), list(knn.values())]}
+                          'clustering': self.__clustering(C), 'shortest': nx.average_shortest_path_length(C)}
 
     def __robustness(self, G):
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
-        rands, degs, closs, betws = [], [], [], []
+        rands, degs, betws = [], [], []
         for p in ps:
             r = A.random(p)
             d = A.degrees(p)
-            c = A.closeness(p)
             b = A.betweenness(p)
             rands.append(self.__connectivity(r))
             degs.append(self.__connectivity(d))
-            closs.append(self.__connectivity(c))
             betws.append(self.__connectivity(b))
-        return rands, degs, closs, betws, ps        # random, degree, closeness, betweenness, eigen, portions
+        return rands, degs, betws, ps        # random, degree, closeness, betweenness, eigen, portions
 
     def __degfreq(self, G):
-        U = nx.to_undirected(G)
-        all = list(dict(U.degree).values())
         in_freq = Counter(dict(G.in_degree).values())
         in_x = list(in_freq.keys())
         in_y = list(in_freq.values())
         out_freq = Counter(dict(G.out_degree).values())
         out_x = list(out_freq.keys())
         out_y = list(out_freq.values())
-        # ins = list(dict(G.in_degree).values())      # ccdf setup
-        # outs = list(dict(G.out_degree).values())    # ccdf setup
-        # in_ccdf_x, in_ccdf_y = self.__ccdf(ins)
-        # out_ccdf_x, out_ccdf_y = self.__ccdf(outs)
-        return [in_x, in_y], [out_x, out_y], all
+        return [in_x, in_y], [out_x, out_y]
 
     def __ccdf(self, degs):
         n, x, _ = plt.hist(degs, density=True, cumulative=True, bins=100); plt.close()
