@@ -12,7 +12,6 @@ import networkx as nx
 from construct import S
 from collections import Counter
 from centrality import centrality
-from matplotlib import pyplot as plt
 from tqdm import tqdm
 from robustness import Robustness
 import os
