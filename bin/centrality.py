@@ -21,10 +21,16 @@ class Centrality(object):
         self.data = {}
 
     def extract(self):
+        """
+        Outputs dictionary of centrality measures
+        """
         self.__setup(self.G)
         return self.data
 
     def __setup(self, G):
+        """
+        Call to calculate all centrality measures
+        """
         if G.is_multigraph():
             G = nx.DiGraph(G)
         self.data['betweenness'] = self.__centrality(nx.betweenness_centrality(G, k=1000))
@@ -35,6 +41,9 @@ class Centrality(object):
         self.data['closeness'] = self.__closeness(G)
 
     def __centrality(self, data):
+        """
+        Outputs binned centrality measures
+        """
         w = np.ones_like(list(data.values())) / (len(data.values()))
         n, x, _ = plt.hist(list(data.values()), bins=20, weights=w)
         plt.close()
@@ -42,6 +51,9 @@ class Centrality(object):
         return list(bin_centers), list(n)
 
     def __closeness(self, G):
+        """
+        Outputs closeness centrality
+        """
         data = {}
         L = self.__component(G)
         for node in random.sample(L.nodes(), 1000):
@@ -50,6 +62,9 @@ class Centrality(object):
         return list(x), list(y)
 
     def __component(self, G):
+        """
+        returns largest components of graph
+        """
         components = sorted(nx.strongly_connected_components(G), key=len)[::-1]
         L = G.subgraph(components[0])
         return L

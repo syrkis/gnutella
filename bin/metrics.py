@@ -3,7 +3,8 @@
 # by: Noah Syrkis
 
 """
-general purpose gnutella plotting
+Class to precompute various network metrics for quick plotting and analysis.
+Main purpose is to take in graph and save data into .json file.
 """
 
 # imports
@@ -21,10 +22,7 @@ import random
 
 # class
 class Metric:
-    """
-    Class to precompute various network metrics for quick plotting and analysis.
-    Main purpose is to take in graph and save data into .json file.
-    """
+
     def __init__(self, G, data={}):
         """
         Calls setup and and precomputes data
@@ -84,7 +82,7 @@ class Metric:
         Returns average shortest path of network.
         """
         lens = []
-        for i in tqdm(range(10000)):
+        for i in range(10000):
             nodes = random.sample(G.nodes(), 2)
             l = nx.shortest_path_length(G, source=nodes[0], target=nodes[1])
             lens.append(l)

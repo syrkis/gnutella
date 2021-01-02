@@ -2,6 +2,11 @@
 #   simulates attacks of the gnutella network
 # by: Noah Syrkis
 
+"""
+Class is initiated with graph. It precalculates betweenness centrality and finds largest component.
+Below are various methods of testing network robustness.
+"""
+
 # imports
 import random
 import networkx as nx
@@ -9,10 +14,7 @@ from operator import itemgetter
 
 
 class Robustness(object):
-    """
-    Class is initiated with graph. It precalculates betweenness centrality and finds largest component.
-    Below are various methods of testing network robustness.
-    """
+
     def __init__(self, graph):
         self.graph = graph
         self.L = self.__component(graph)
