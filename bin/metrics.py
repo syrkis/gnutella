@@ -47,7 +47,7 @@ class Metric:
         # degree distribution
         G_degs = self.__degfreq(G)
         self.data['degs'] = {'in': G_degs[0], 'out': G_degs[1]}
-        # centrality measures, clustering, knn
+        # centrality measures, clustering
         self.data['robustness'] = self.__robustness(G)
         self.data['centrality'] = centrality(G)
         self.data['clustering'] = self.__clustering(G)
