@@ -39,6 +39,17 @@ class Robustness(object):
         S = nx.subgraph(G, nodes)
         return S
 
+    def eigen(self, p):
+        G = self.L
+        if G.is_multigraph():
+            G = nx.DiGraph(G)
+        eiges = nx.eigenvector_centrality(G, max_iter=200)
+        nodes = [(k, v) for k, v in eiges.items()]
+        nodes = sorted(nodes, key=itemgetter(1))[::-1]
+        nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
+        S = nx.subgraph(G, nodes)
+        return S
+
     def betweenness(self, p):
         """
         Removes a p-th of the nodes by betweenness centrality and returns subgraph
@@ -50,6 +61,17 @@ class Robustness(object):
         nodes = [entry[0] for entry in nodes][int(len(nodes) * p):]
         S = nx.subgraph(G, nodes)
         return S
+
+    def random_edge(self, p):
+        G = self.L.copy()
+        targets = random.sample(G.edges(), int(p * len(G.edges())))
+        for edge in targets:
+            G.remove_edge(edge[0], edge[1])
+        return G
+
+    def deg_edge(self, p):
+        G = self.L
+        S = nx.subgraph(G, nodes)
 
     def __component(self, G):
         """
@@ -72,7 +94,7 @@ def main():
     G = list(S.values())[-2]
     robustness = Robustness(G)
     #attack.random(0.1)
-    S = robustness.closeness(0.1)
+    S = robustness.random_edge(0.1)
     print(nx.info(S))
 
 

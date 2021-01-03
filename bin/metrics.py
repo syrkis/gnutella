@@ -66,15 +66,19 @@ class Metric:
         """
         A = Robustness(G)
         ps = [0.05 * i for i in range(0, 20)]
-        rands, degs, betws = [], [], []
+        rands, degs, betws, eigs, links = [], [], [], [], []
         for p in ps:
             r = A.random(p)
             d = A.degrees(p)
             b = A.betweenness(p)
+            e = A.eigen(p)
+            l = A.random_edge(p)
             rands.append(self.__connectivity(r))
             degs.append(self.__connectivity(d))
             betws.append(self.__connectivity(b))
-        return rands, degs, betws, ps        # random, degree, closeness, betweenness, eigen, portions
+            eigs.append(self.__connectivity(e))
+            links.append(self.__connectivity(l))
+        return rands, degs, betws, eigs, links, ps        # random, degree, closeness, betweenness, eigen, portions
 
     def __shortest(self, G):
         """
