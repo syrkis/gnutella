@@ -10,7 +10,7 @@ import os
 
 # construct
 path = '../data/graphs/'
-targets = [path + target for target in os.listdir(path) if target[-1] == 't']
+targets = sorted([path + target for target in os.listdir(path) if target[-1] == 't'])
 S = {idx: nx.read_edgelist(target, delimiter="\t", create_using=nx.DiGraph(name='test'), nodetype=int) \
      for idx, target in enumerate(targets)}
 for idx, G in enumerate(S):
