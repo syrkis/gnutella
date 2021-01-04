@@ -69,10 +69,6 @@ class Robustness(object):
             G.remove_edge(edge[0], edge[1])
         return G
 
-    def deg_edge(self, p):
-        G = self.L
-        S = nx.subgraph(G, nodes)
-
     def __component(self, G):
         """
         Takes in graph and returns largest strongly connected component

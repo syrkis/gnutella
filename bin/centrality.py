@@ -47,7 +47,7 @@ class Centrality(object):
         w = np.ones_like(list(data.values())) / (len(data.values()))
         n, x, _ = plt.hist(list(data.values()), bins=20, weights=w)
         plt.close()
-        bin_centers = 0.5*(x[1:]+x[:-1])
+        bin_centers = 0.5 * (x[1:] + x[:-1])
         return list(bin_centers), list(n)
 
     def __closeness(self, G):
@@ -74,3 +74,14 @@ def centrality(G):
     C = Centrality(G).extract()
     return C
 
+
+def main():
+    from construct import S
+    G = S[7]
+    C = Centrality(G)
+    out = C.closeness(G)
+    print(out)
+
+
+if __name__ == '__main__':
+    main()
