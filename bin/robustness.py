@@ -34,7 +34,7 @@ class Robustness(object):
         Removes a p-th of the nodes by degree and returns subgraph
         """
         G = self.L
-        degs = sorted(G.degree, key=itemgetter(1))[::-1]
+        degs = sorted(G.in_degree, key=itemgetter(1))[::-1]
         nodes = [entry[0] for entry in degs][int(len(degs) * p):]
         S = nx.subgraph(G, nodes)
         return S
