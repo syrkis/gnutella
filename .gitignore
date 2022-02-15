@@ -1,8 +1,10 @@
+**/trash
 other/.ipynb*
 bin/__pycache__
 docs/plots
 docs/*.jpg
 data/
+**/.*.*.icloud
 
 #### JUPYTER STUFF ####
 
